@@ -7,6 +7,7 @@
 
 
 import os
+import torch
 from torchvision import datasets, transforms
 
 from timm.data.constants import \
@@ -44,7 +45,14 @@ def build_dataset(is_train, args):
         raise NotImplementedError()
     print("Number of the class = %d" % nb_classes)
 
-    return dataset, nb_classes
+    # take only part of the data to decrease runtime
+    if is_train:
+        idx = torch.randint(0, 50000, (1000, 1))
+    else:
+        idx = torch.randint(0, 10000, (200, 1))
+    ds_small = torch.utils.data.Subset(dataset, idx)  # subset taking only 2% of the available images
+
+    return ds_small, nb_classes
 
 
 def build_transform(is_train, args):
