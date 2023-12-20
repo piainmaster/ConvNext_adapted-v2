@@ -25,13 +25,14 @@ class Block(nn.Module):
     """
     def __init__(self, dim, drop_path=0., layer_scale_init_value=1e-6):
         super().__init__()
-        self.dwconv = nn.Conv2d(dim, dim, kernel_size=7, padding=3, groups=dim) # depthwise conv
+        self.pwconv1 = nn.Linear(dim, dim) # pointwise/1x1 convs, implemented with linear layers
         self.norm = nn.BatchNorm(dim, eps=1e-6)
         self.act = nn.RELU()
-        self.pwconv1 = nn.Linear(dim, 4 * dim) # pointwise/1x1 convs, implemented with linear layers
-        self.norm = nn.BatchNorm(dim, eps=1e-6)
+        self.dwconv = nn.Conv2d(dim, 4 * dim, kernel_size=3, padding=3, groups=dim)  # depthwise conv
+        self.norm = nn.BatchNorm(4 * dim, eps=1e-6)
         self.act = nn.RELU()
         self.pwconv2 = nn.Linear(4 * dim, dim)
+        self.norm = nn.BatchNorm(dim, eps=1e-6)
         self.gamma = nn.Parameter(layer_scale_init_value * torch.ones((dim)), 
                                     requires_grad=True) if layer_scale_init_value > 0 else None
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
@@ -66,7 +67,7 @@ class ConvNeXt(nn.Module):
         head_init_scale (float): Init scaling value for classifier weights and biases. Default: 1.
     """
     def __init__(self, in_chans=3, num_classes=1000, 
-                 depths=[3, 3, 9, 3], dims=[96, 192, 384, 768], drop_path_rate=0., 
+                 depths=[3, 3, 9, 3], dims=[64, 128, 256, 512], drop_path_rate=0.,
                  layer_scale_init_value=1e-6, head_init_scale=1.,
                  ):
         super().__init__()
