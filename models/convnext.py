@@ -26,13 +26,13 @@ class Block(nn.Module):
     def __init__(self, dim, drop_path=0., layer_scale_init_value=1e-6):
         super().__init__()
         self.pwconv1 = nn.Linear(dim, dim) # pointwise/1x1 convs, implemented with linear layers
-        self.norm = nn.BatchNorm(dim, eps=1e-6)
+        self.norm = nn.BatchNorm2d(dim, eps=1e-6)
         self.act = nn.RELU()
         self.dwconv = nn.Conv2d(dim, 4 * dim, kernel_size=3, padding=3, groups=dim)  # depthwise conv
-        self.norm = nn.BatchNorm(4 * dim, eps=1e-6)
+        self.norm = nn.BatchNorm2d(4 * dim, eps=1e-6)
         self.act = nn.RELU()
         self.pwconv2 = nn.Linear(4 * dim, dim)
-        self.norm = nn.BatchNorm(dim, eps=1e-6)
+        self.norm = nn.BatchNorm2d(dim, eps=1e-6)
         self.gamma = nn.Parameter(layer_scale_init_value * torch.ones((dim)), 
                                     requires_grad=True) if layer_scale_init_value > 0 else None
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
@@ -75,12 +75,12 @@ class ConvNeXt(nn.Module):
         self.downsample_layers = nn.ModuleList() # stem and 3 intermediate downsampling conv layers
         stem = nn.Sequential(
             nn.Conv2d(in_chans, dims[0], kernel_size=4, stride=4),
-            nn.BatchNorm(dims[0], eps=1e-6, data_format="channels_first")
+            nn.BatchNorm2d(dims[0], eps=1e-6, data_format="channels_first")
         )
         self.downsample_layers.append(stem)
         for i in range(3):
             downsample_layer = nn.Sequential(
-                    nn.BatchNorm(dims[i], eps=1e-6, data_format="channels_first"),
+                    nn.BatchNorm2d(dims[i], eps=1e-6, data_format="channels_first"),
                     nn.Conv2d(dims[i], dims[i+1], kernel_size=2, stride=2),
             )
             self.downsample_layers.append(downsample_layer)
@@ -96,7 +96,7 @@ class ConvNeXt(nn.Module):
             self.stages.append(stage)
             cur += depths[i]
 
-        self.norm = nn.BatchNorm(dims[-1], eps=1e-6) # final norm layer
+        self.norm = nn.BatchNorm2d(dims[-1], eps=1e-6) # final norm layer
         self.head = nn.Linear(dims[-1], num_classes)
 
         self.apply(self._init_weights)
