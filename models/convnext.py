@@ -27,10 +27,10 @@ class Block(nn.Module):
         super().__init__()
         self.pwconv1 = nn.Linear(dim, dim) # pointwise/1x1 convs, implemented with linear layers
         self.norm = nn.BatchNorm2d(dim, eps=1e-6)
-        self.act = nn.ReLu()
+        self.act = nn.ReLU()
         self.dwconv = nn.Conv2d(dim, 4 * dim, kernel_size=3, padding=3, groups=dim)  # depthwise conv
         self.norm = nn.BatchNorm2d(4 * dim, eps=1e-6)
-        self.act = nn.ReLu()
+        self.act = nn.ReLU()
         self.pwconv2 = nn.Linear(4 * dim, dim)
         self.norm = nn.BatchNorm2d(dim, eps=1e-6)
         self.gamma = nn.Parameter(layer_scale_init_value * torch.ones((dim)), 
