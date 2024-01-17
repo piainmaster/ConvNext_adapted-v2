@@ -47,9 +47,9 @@ def build_dataset(is_train, args):
 
     # take only part of the data to decrease runtime
     if is_train:
-        idx = torch.randint(0, 50000, (1000, 1))
+        idx = torch.randint(0, 50000, (5000, 1))
     else:
-        idx = torch.randint(0, 10000, (200, 1))
+        idx = torch.randint(0, 10000, (1000, 1))
     ds_small = torch.utils.data.Subset(dataset, idx)  # subset taking only 10% of the available images
 
     return ds_small, nb_classes
