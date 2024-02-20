@@ -21,7 +21,7 @@ class Block(nn.Module):
     Args:
         dim (int): Number of input channels.
         drop_path (float): Stochastic depth rate. Default: 0.0
-        layer_scale_init_value (float): Init value for Layer Scale. Default: 1e-6.
+        layer_scale_init_value (float): Init value for Layer Scale. Default: 1e-6. 
     """
     def __init__(self, dim, drop_path=0., layer_scale_init_value=1e-6):
         super().__init__()
